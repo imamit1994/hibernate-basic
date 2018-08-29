@@ -1,0 +1,146 @@
+hibernate
+----------
+--framework to saving and retrivimg data from database
+
+benefit
+-------
+--handle all the low level sql code
+--minimize the jdbc code yoy have to develop
+--provide object to relational mapping
+
+hibernate and jdbc
+-------------------
+--hibernate uses jdbc for database communication
+--hibernate is layer on top of jdbc
+
+hibernate Dev process
+-----------------------
+--1)add hibernate config file(how to connect to the database)
+--2)Annotate java class
+	--1)map class to database table
+	--2)Map field to database coulmn
+@Entity
+@Table(name="student")  ---student is table name in db
+public class Student {
+	
+	@Id
+	@Column(name="id")
+	private int id;
+	
+	@Column(name="first_name") --first_name is coulmn name in table
+	private String firstName;
+	
+	@Column(name="last_name")
+	private String lastName;
+	
+	@Column(name="email")
+	private String email;
+	
+	public Student() {};
+
+}
+
+--3)Develop java code to perform database operation
+
+class
+--------------
+--1)sessionFactory:Reads hinernate config file create session object, it is heavy weight object only created once in your app and can be
+   reused over and over time agaibn
+--2)session:wrap a jdbc connection,used to save and retrieve object, short lived object, retrieve from session factory
+
+//creaet a session factroy 
+		SessionFactory factory=new Configuration()
+				.configure("hibernate.cfg.xml")
+				.addAnnotatedClass(Student.class)
+				.buildSessionFactory();
+		
+		//create session
+		Session session=factory.getCurrentSession();
+		
+		try {
+			//create student object
+			Student tmpStudent=new Student("Amit","Singh","aks@gmail.com");
+			
+			//start transaction
+			session.beginTransaction();
+			
+			//save the student object
+			session.save(tmpStudent);
+			
+			//commit transaction
+			session.getTransaction().commit();
+		}finally {
+			factory.close();
+		}
+		
+retrieve object
+---------------
+session=factory.getCurrentSession();
+			session.beginTransaction();
+			
+			//retrieve Student based on Id's
+			System.out.println("\nGetting student with id: "+tmpStudent.getId());
+			Student myStudent=session.get(Student.class,tmpStudent.getId());
+			System.out.println("Get complete:: "+myStudent);
+			
+			//commit the transaction
+			session.getTransaction().commit();
+			System.out.println("Done");
+			
+HQL(Hibernate Query Language)
+-------------------------------
+theStudents=session.createQuery("from Student s where s.firstName='Tanya'").list();
+--in createQuery Student-->it is Java class name and firstName->it is java class Field Name
+
+update operatrion
+------------------
+int studentId=1;
+			
+			//now get a new session and start transaction
+			session=factory.getCurrentSession();
+			session.beginTransaction();
+			
+			//retrieve Student based on Id's
+			System.out.println("\nGetting student with id: "+studentId);
+			Student myStudent=session.get(Student.class,studentId);
+			
+			System.out.println("Updating Student");
+			myStudent.setFirstName("Sonali");
+			
+			
+			//commit the transaction
+			session.getTransaction().commit();
+HQL
+----------
+session.createQuery("update Student set email='anshurani@gf.in'").executeUpdate();
+
+
+Delete Operation
+-----------------
+int studentId=1;
+			
+			//now get a new session and start transaction
+			session=factory.getCurrentSession();
+			session.beginTransaction();
+			
+			//retrieve Student based on Id's
+			System.out.println("\nGetting student with id: "+studentId);
+			Student myStudent=session.get(Student.class,studentId);
+			 
+			//delete the Student
+			//System.out.println("Deletring Student:: "+myStudent);
+			//session.delete(myStudent);
+			
+			//delete student id =2
+			System.out.println("deleting Dtudent with id=2");
+			session.createQuery("delete from Student where id=2").executeUpdate();
+			
+			//commit the transaction
+			session.getTransaction().commit();
+			
+Hibernate advanced mappin
+--------------------------
+1)one to one
+2)one to many, many to one
+3)many to many
+			
